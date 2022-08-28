@@ -2,36 +2,30 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 )
 
 // create binary for a command
-func aBinary(command aCommand) []byte {
-	b := make([]byte, 1)
-	b[0] = 48 // 0
-	res := ""
-	if _, err := strconv.Atoi(command.Data); err == nil {
+func aBinary(command aCommand) (string, error) {
+	b := "0"
+	if _, notInt := strconv.Atoi(command.Data); notInt == nil {
 		i, err := strconv.ParseInt(command.Data, 10, 16)
 		if err != nil {
-			log.Println(err)
+			return "", err
 		}
-		res = fmt.Sprintf("%015b", i) + "\n"
+		b += fmt.Sprintf("%015b", i) + "\n"
 	} else {
 		if val, ok := dict[command.Data]; ok {
 			i := val
-			res = fmt.Sprintf("%015b", i) + "\n"
+			b += fmt.Sprintf("%015b", i) + "\n"
 		} else {
 			dict[command.Data] = nxt
 			i := nxt
 			nxt += 1
-			res = fmt.Sprintf("%015b", i) + "\n"
+			b += fmt.Sprintf("%015b", i) + "\n"
 		}
 	}
-	for _, c := range res {
-		b = append(b, byte(c))
-	}
-	return b
+	return b, nil
 }
 
 // convert string to binary in the religion of comp
@@ -93,23 +87,30 @@ func jumpToBinary(c cCommand) string {
 	m["JNE"] = "101"
 	m["JLE"] = "110"
 	m["JMP"] = "111"
-	return m[c.Jump] + "\n"
+	return m[c.Jump]
 }
 
 // create binary for c command
-func cBinary(command cCommand) []byte {
-	b := make([]byte, 3)
-	b[0] = 49 // 1
-	b[1] = 49 // 1
-	b[2] = 49 // 1
+func cBinary(command cCommand) (string, error) {
+	cString := "111"
 	for _, c := range compToBinary(command) {
-		b = append(b, byte(c))
+		cString += string(c)
+	}
+	if len(cString) != 10 {
+		return "", fmt.Errorf("error: invalid cCommand.comp to binary")
 	}
 	for _, c := range destToBinary(command) {
-		b = append(b, byte(c))
+		cString += string(c)
+	}
+	if len(cString) != 13 {
+		return "", fmt.Errorf("error: invalid cCommand.comp to binary")
 	}
 	for _, c := range jumpToBinary(command) {
-		b = append(b, byte(c))
+		cString += string(c)
 	}
-	return b
+	if len(cString) != 16 {
+		return "", fmt.Errorf("error: invalid cCommand.comp to binary")
+	}
+	cString += "\n"
+	return cString, nil
 }

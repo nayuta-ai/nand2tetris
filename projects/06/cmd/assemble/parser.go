@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
 // remove comment
 // example: "@32 // A instruction" -> "@32"
-func RemoveComment(line string) string {
+func removeComment(line string) string {
 	for i := 1; i < len(line); i++ {
 		if line[i-1:i+1] == "//" {
 			return strings.TrimSpace(line[:i-1])
@@ -31,17 +32,17 @@ type cCommand struct {
 // if line has "@", it is a command
 // elif line has "()", it is l command
 // else, it is c command
-func CommandType(line string) []byte {
+func commandType(line string) (string, error) {
 	for _, char := range line {
 		if string([]rune{char}) == "@" {
 			return aBinary(aParse(line))
 		} else if string([]rune{char}) == "(" {
-			return nil // lParse(line) // l command
+			return "", nil // lParse(line) // l command
 		} else {
 			return cBinary(cParse(line)) // c command
 		}
 	}
-	return nil
+	return "", fmt.Errorf("unsupported")
 }
 
 // a command parser extracts strings after "@"
