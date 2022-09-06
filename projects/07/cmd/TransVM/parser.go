@@ -4,19 +4,44 @@ import (
 	"strings"
 )
 
+var trial = 0 // count the trial of calling commandCompare
+
 // parser returns the string of parse a line in .vm file.
 func parser(command string) string {
 	div_command := divideCommand(removeComment(command)) // Divide the command by the space
 	if len(div_command) == 0 {
 		return ""
 	} else if len(div_command) == 1 {
-		if div_command[0] == "add" {
-			return commandAdd(command)
-		}
+		return callCommand(div_command[0])
 	} else if len(div_command) == 3 {
 		if div_command[0] == "push" {
 			return commandPush(command, div_command)
 		}
+	}
+	return ""
+}
+
+// callCommand returns the string of parse a line in .vm file such as
+// add, sub, neg, eq, lt, gt, and, or, not
+func callCommand(command string) string {
+	if command == "add" {
+		return commandAdd(command)
+	} else if command == "sub" {
+		return commandSub(command)
+	} else if command == "neg" {
+		return commandNeg(command)
+	} else if command == "eq" {
+		return commandEq(command)
+	} else if command == "lt" {
+		return commandLt(command)
+	} else if command == "gt" {
+		return commandGt(command)
+	} else if command == "and" {
+		return commandAnd(command)
+	} else if command == "or" {
+		return commandOr(command)
+	} else if command == "not" {
+		return commandNot(command)
 	}
 	return ""
 }
