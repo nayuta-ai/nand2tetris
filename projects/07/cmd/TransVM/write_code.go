@@ -21,12 +21,67 @@ func commandPush(command string, div_command []string) string {
 	if div_command[1] == "constant" {
 		asm_command += "@" + div_command[2] + "\n" // get value
 		asm_command += "D=A\n"
-		asm_command += "@SP\n"
-		asm_command += "A=M\n"
-		asm_command += "M=D\n"
-		asm_command += "@SP\n"
-		asm_command += "M=M+1\n"
+	} else {
+		asm_command += commandSymbol(command, div_command)
+		asm_command += "D=M\n"
 	}
+	asm_command += "@SP\n"
+	asm_command += "A=M\n"
+	asm_command += "M=D\n"
+	asm_command += "@SP\n"
+	asm_command += "M=M+1\n"
+	return asm_command
+}
+
+// commandPop converts "pop" lines in vm file to lines in asm file and returns lines in asm file.
+func commandPop(command string, div_command []string) string {
+	var asm_command = addVMCommand(command)
+	asm_command += commandSymbol(command, div_command)
+	asm_command += "D=A\n"
+	asm_command += "@R13\n"
+	asm_command += "M=D\n"
+	asm_command += "@SP\n"
+	asm_command += "M=M-1\n"
+	asm_command += "A=M\n"
+	asm_command += "D=M\n"
+	asm_command += "@R13\n"
+	asm_command += "A=M\n"
+	asm_command += "M=D\n"
+	return asm_command
+}
+
+// commandSymbol converts any symbol such as temp, local, etc. lines in vm file to lines in asm file and returns lines in asm file.
+func commandSymbol(command string, div_command []string) string {
+	if div_command[1] == "temp" {
+		return useTemp(div_command[2])
+	} else {
+		return useSymbol(command, div_command)
+	}
+}
+
+// useTemp converts "temp" lines in vm file to lines in asm file and returns lines in asm file.
+func useTemp(index string) string {
+	i, _ := strconv.ParseInt(index, 10, 32)
+	i += 5
+	str := strconv.Itoa(int(i))
+	return "@R" + str + "\n"
+}
+
+// useSymbol converts "local", "arg", "this", "that", etc. lines in vm file to lines in asm file and returns lines in asm file.
+func useSymbol(command string, div_command []string) string {
+	var asm_command string
+	if div_command[1] == "local" {
+		asm_command += "@LCL\n"
+	} else if div_command[1] == "argument" {
+		asm_command += "@ARG\n"
+	} else if div_command[1] == "this" {
+		asm_command += "@THIS\n"
+	} else if div_command[1] == "that" {
+		asm_command += "@THAT\n"
+	}
+	asm_command += "D=M\n"
+	asm_command += "@" + div_command[2] + "\n"
+	asm_command += "A=D+A\n"
 	return asm_command
 }
 

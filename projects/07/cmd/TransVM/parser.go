@@ -16,6 +16,8 @@ func parser(command string) string {
 	} else if len(div_command) == 3 {
 		if div_command[0] == "push" {
 			return commandPush(command, div_command)
+		} else if div_command[0] == "pop" {
+			return commandPop(command, div_command)
 		}
 	}
 	return ""
