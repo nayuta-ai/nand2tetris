@@ -54,8 +54,26 @@ func commandPop(command string, div_command []string) string {
 func commandSymbol(command string, div_command []string) string {
 	if div_command[1] == "temp" {
 		return useTemp(div_command[2])
+	} else if div_command[1] == "pointer" {
+		return usePointer(div_command[2])
+	} else if div_command[1] == "static" {
+		return useStatic(div_command[2])
 	} else {
 		return useSymbol(command, div_command)
+	}
+}
+
+// useStatic converts "static" lines in vm file to lines in asm file and returns lines in asm file.
+func useStatic(val string) string {
+	return "@Val" + val + "\n"
+}
+
+// usePointer converts "pointer" lines in vm file to lines in asm file and returns lines in asm file.
+func usePointer(val string) string {
+	if val == "0" {
+		return "@THIS\n"
+	} else {
+		return "@THAT\n"
 	}
 }
 
