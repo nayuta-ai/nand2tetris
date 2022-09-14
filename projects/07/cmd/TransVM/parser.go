@@ -4,8 +4,6 @@ import (
 	"strings"
 )
 
-var trial = 0 // count the trial of calling commandCompare
-
 // parser returns the string of parse a line in .vm file.
 func parser(command string) string {
 	div_command := divideCommand(removeComment(command)) // Divide the command by the space

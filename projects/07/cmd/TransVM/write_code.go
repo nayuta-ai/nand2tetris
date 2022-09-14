@@ -2,6 +2,8 @@ package main
 
 import "strconv"
 
+var trial = 0 // count the trial of calling commandCompare
+
 // addVMCommand returns the comment line which is formatted the VM command.
 func addVMCommand(command string) string {
 	return "//" + command + "\n"
