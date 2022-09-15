@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// This function test aBinary function
 func TestABinary(t *testing.T) {
 	preDict()
 	tests := []struct {
@@ -24,6 +25,7 @@ func TestABinary(t *testing.T) {
 	}
 }
 
+// This function test compToBinary function
 func TestCompToBinary(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -43,6 +45,7 @@ func TestCompToBinary(t *testing.T) {
 	}
 }
 
+// This function test destToBinary function
 func TestDestToBinary(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -62,6 +65,7 @@ func TestDestToBinary(t *testing.T) {
 	}
 }
 
+// This function test jumpToBinary function
 func TestJumpToBinary(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -81,6 +85,7 @@ func TestJumpToBinary(t *testing.T) {
 	}
 }
 
+// This function test cBinary function
 func TestCBinary(t *testing.T) {
 	tests := []struct {
 		name    string

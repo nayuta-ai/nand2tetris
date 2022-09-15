@@ -8,9 +8,10 @@ import (
 )
 
 // parse the argument of filename and create filepath variable
-func parseArgs() (string, error) {
-	f := flag.String("filename", "", "filename")
-	flag.Parse()
+func parseArgs(args ...string) (string, error) {
+	flg := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	f := flg.String("filename", "add/Add", "filename flag")
+	flg.Parse(args)
 	if *f == "" {
 		return "", fmt.Errorf("error: filename is empty")
 	}
@@ -26,7 +27,7 @@ func scanline(fp *os.File) ([]string, error) {
 	for scanner.Scan() {
 		line := removeComment(scanner.Text()) // remove comment
 		if len(line) != 0 {
-			char := lParse(line)
+			char := lParser(line)
 			if char != "" {
 				dict[char] = count
 				count -= 1

@@ -35,11 +35,11 @@ type cCommand struct {
 func commandType(line string) (string, error) {
 	for _, char := range line {
 		if string([]rune{char}) == "@" {
-			return aBinary(aParse(line))
+			return aBinary(aParser(line))
 		} else if string([]rune{char}) == "(" {
 			return "", nil // lParse(line) // l command
 		} else {
-			return cBinary(cParse(line)) // c command
+			return cBinary(cParser(line)) // c command
 		}
 	}
 	return "", fmt.Errorf("unsupported")
@@ -47,7 +47,7 @@ func commandType(line string) (string, error) {
 
 // a command parser extracts strings after "@"
 // example: "@32" -> aCommand.Data = "32"
-func aParse(line string) aCommand {
+func aParser(line string) aCommand {
 	var val = make([]byte, 0, 100)
 	for i, char := range line {
 		if i > 0 {
@@ -61,7 +61,7 @@ func aParse(line string) aCommand {
 
 // l command parser extracts strings after "(" and before ")"
 // example: "(LOOP)" -> lCommand.Data = "LOOP"
-func lParse(line string) string {
+func lParser(line string) string {
 	var val = make([]byte, 0, 100)
 	for i, char := range line {
 		if i == 0 && string(char) != "(" {
@@ -77,7 +77,7 @@ func lParse(line string) string {
 // c command parser extracts some strings; one called dest is before "=",
 // second called comp is within "=" and ";", the other called jump is after ";"
 // example: "A=D-A;JEQ" -> cCommand.Comp = "D-A", cCommand.Dest = "A", cCommand.Jump = "JEQ"
-func cParse(line string) cCommand {
+func cParser(line string) cCommand {
 	var dest = make([]byte, 0, 100)
 	var jump = make([]byte, 0, 100)
 	var comp = make([]byte, 0, 100)

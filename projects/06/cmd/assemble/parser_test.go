@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// This function test removeComment function
 func TestRemoveComment(t *testing.T) {
 	tests := []struct {
 		name string
@@ -23,6 +24,7 @@ func TestRemoveComment(t *testing.T) {
 	}
 }
 
+// This function test lParser function
 func TestLParser(t *testing.T) {
 	tests := []struct {
 		name string
@@ -35,14 +37,15 @@ func TestLParser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := lParse(tt.line); got != tt.want {
+			if got := lParser(tt.line); got != tt.want {
 				t.Errorf("want %s. but %s", tt.want, got)
 			}
 		})
 	}
 }
 
-func TestAParse(t *testing.T) {
+// This function test aParser function
+func TestAParser(t *testing.T) {
 	tests := []struct {
 		name string
 		line string
@@ -54,14 +57,15 @@ func TestAParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := aParse(tt.line); got != tt.want {
+			if got := aParser(tt.line); got != tt.want {
 				t.Errorf("want %s. but %s", tt.want, got)
 			}
 		})
 	}
 }
 
-func TestCParse(t *testing.T) {
+// This function test cParser function
+func TestCParser(t *testing.T) {
 	tests := []struct {
 		name string
 		line string
@@ -73,13 +77,14 @@ func TestCParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := cParse(tt.line); got != tt.want {
+			if got := cParser(tt.line); got != tt.want {
 				t.Errorf("want %s. but %s", tt.want, got)
 			}
 		})
 	}
 }
 
+// This function test commandType function
 func TestCommandType(t *testing.T) {
 	tests := []struct {
 		name string

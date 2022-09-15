@@ -10,7 +10,7 @@ var nxt = 16                    // address for undefined variable
 
 // read the file and write the binary represents to *.hack
 func main() {
-	filepath, err := parseArgs()
+	filepath, err := parseArgs(os.Args[1:]...)
 	if err != nil {
 		log.Println(err)
 	}
