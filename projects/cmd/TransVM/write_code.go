@@ -1,6 +1,8 @@
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 var trial = 0 // count the trial of calling commandCompare
 
@@ -12,6 +14,93 @@ func addVMCommand(command string) string {
 // addSpace returns the asm command which is added the new line.
 func addSpace(asm_command string) string {
 	return asm_command + "\n"
+}
+
+func commandLabel(command string) string {
+	return "(" + command + ")" + "\n"
+}
+
+func commandIfGoto(command string) string {
+	return "@SP\nAM=M-1\nD=M\n" + "@" + command + "\n" + "D;JGT\n"
+}
+
+func commandGoto(command string) string {
+	return "@" + command + "\n" + "0;JMP\n"
+}
+
+func initialPush(num string) string {
+	var asm_command string
+	asm_command += "D=" + num + "\n"
+	asm_command += "@SP\n"
+	asm_command += "A=M\n"
+	asm_command += "M=D\n"
+	asm_command += "@SP\n"
+	asm_command += "M=M+1\n"
+	return asm_command
+}
+
+func commandFunction(command string, div_command []string) (string, error) {
+	var asm_command = addVMCommand(command)
+	asm_command += "(" + div_command[1] + ")\n"
+	repeat_time, err := strconv.Atoi(div_command[2])
+	if err != nil {
+		return "", err
+	}
+	for i := 0; i < repeat_time; i++ {
+		asm_command += initialPush("0")
+	}
+	return asm_command, nil
+}
+
+func restoreAddress(pointer string, num string) string {
+	var asm_command string
+	asm_command += "@R5\n"
+	asm_command += "D=M\n"
+	asm_command += "@" + num + "\n"
+	asm_command += "D=D-A\n"
+	asm_command += "A=D\n"
+	asm_command += "D=M\n"
+	asm_command += "@" + pointer + "\n"
+	asm_command += "M=D\n"
+	return asm_command
+}
+
+func commandReturn(command string) string {
+	var asm_command = addVMCommand(command)
+	// FRAME = LCL
+	asm_command += "@LCL\n"
+	asm_command += "D=M\n"
+	// RET = *(FRAME-5)
+	asm_command += "@R5\n"
+	asm_command += "M=D\n"
+	// *ARG = pop()
+	asm_command += "@SP\n"
+	asm_command += "M=M-1\n"
+	asm_command += "A=M\n"
+	asm_command += "D=M\n"
+	asm_command += "@ARG\n"
+	asm_command += "A=M\n"
+	asm_command += "M=D\n"
+	// SP = ARG+1
+	asm_command += "@ARG\n"
+	asm_command += "D=M\n"
+	asm_command += "@SP\n"
+	asm_command += "M=D+1\n"
+	// THAT = *(FRAME-1)
+	asm_command += restoreAddress("THAT", "1")
+	// THIS = *(FRAME-2)
+	asm_command += restoreAddress("THIS", "2")
+	// ARG = *(FRAME-3)
+	asm_command += restoreAddress("ARG", "3")
+	// ARG = *(FRAME-4)
+	asm_command += restoreAddress("LCL", "4")
+	// RET = *(FRAME-5)
+	asm_command += restoreAddress("R6", "5")
+	// goto RET
+	asm_command += "@R6\n"
+	asm_command += "A=M\n"
+	asm_command += "0;JMP\n"
+	return asm_command
 }
 
 // commandPush converts "push" lines in vm file to lines in asm file and returns lines in asm file.
@@ -43,8 +132,7 @@ func commandPop(command string, div_command []string) string {
 	asm_command += "@R13\n"
 	asm_command += "M=D\n"
 	asm_command += "@SP\n"
-	asm_command += "M=M-1\n"
-	asm_command += "A=M\n"
+	asm_command += "AM=M-1\n"
 	asm_command += "D=M\n"
 	asm_command += "@R13\n"
 	asm_command += "A=M\n"
@@ -131,17 +219,19 @@ func commandCalc(command string, types string) string {
 	asm_command += "@SP\n"
 	asm_command += "AM=M-1\n"
 	asm_command += "D=M\n"
-	asm_command += "A=A-1\n"
+	asm_command += "@SP\n"
+	asm_command += "AM=M-1\n"
 	if types == "add" {
-		asm_command += "D=M+D\n"
+		asm_command += "M=M+D\n"
 	} else if types == "sub" {
-		asm_command += "D=M-D\n"
+		asm_command += "M=M-D\n"
 	} else if types == "and" {
-		asm_command += "D=M&D\n"
+		asm_command += "M=M&D\n"
 	} else if types == "or" {
-		asm_command += "D=M|D\n"
+		asm_command += "M=M|D\n"
 	}
-	asm_command += "M=D\n"
+	asm_command += "@SP\n"
+	asm_command += "M=M+1\n"
 	return asm_command
 }
 
