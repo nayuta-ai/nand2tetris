@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// create binary for a command
+// This function creates a binary for a command
 func aBinary(command aCommand) (string, error) {
 	b := "0"
 	if _, notInt := strconv.Atoi(command.Data); notInt == nil {
@@ -28,7 +28,7 @@ func aBinary(command aCommand) (string, error) {
 	return b, nil
 }
 
-// convert string to binary in the religion of comp
+// This function converts a string to a binary in the religion of comp
 func compToBinary(c cCommand) string {
 	m := make(map[string]string)
 	m["0"] = "0101010"
@@ -62,7 +62,7 @@ func compToBinary(c cCommand) string {
 	return m[c.Comp]
 }
 
-// convert string to binary in the religion of dest
+// This function converts a string to a binary in the religion of dest
 func destToBinary(c cCommand) string {
 	m := make(map[string]string)
 	m[""] = "000"
@@ -76,7 +76,7 @@ func destToBinary(c cCommand) string {
 	return m[c.Dest]
 }
 
-// convert string to binary in the religion of jump
+// This function converts a string to a binary in the religion of jump
 func jumpToBinary(c cCommand) string {
 	m := make(map[string]string)
 	m[""] = "000"
@@ -90,7 +90,7 @@ func jumpToBinary(c cCommand) string {
 	return m[c.Jump]
 }
 
-// create binary for c command
+// This function creates a binary for c command
 func cBinary(command cCommand) (string, error) {
 	cString := "111"
 	for _, c := range compToBinary(command) {

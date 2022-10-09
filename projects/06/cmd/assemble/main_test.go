@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// This function performs benchmack test on main function
 func BenchmarkMain(b *testing.B) {
 	for i := 0; i < 2; i++ {
 		filepath := "test/add/Add"

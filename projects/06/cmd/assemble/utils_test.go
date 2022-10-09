@@ -15,6 +15,7 @@ func TestArgParser(t *testing.T) {
 	})
 }
 
+// This function test scanline function
 func TestScanline(t *testing.T) {
 	fp, _ := os.Open("test/add/Add.asm")
 	want := make([]string, 0)
@@ -35,6 +36,7 @@ func TestScanline(t *testing.T) {
 	})
 }
 
+// This function test createHack function
 func TestCreateHack(t *testing.T) {
 	want := make([]string, 0)
 	want = append(want, "0000000000000010\n")

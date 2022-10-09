@@ -5,10 +5,10 @@ import (
 	"os"
 )
 
-var dict = make(map[string]int) // dictionary for acommand, lcommand
-var nxt = 16                    // address for undefined variable
+var dict = make(map[string]int) // It is a dictionary for acommand, lcommand
+var nxt = 16                    // It is an address for undefined variable
 
-// read the file and write the binary represents to *.hack
+// This main function reads the file and writes the binary representation to *.hack
 func main() {
 	filepath, err := parseArgs(os.Args[1:]...)
 	if err != nil {

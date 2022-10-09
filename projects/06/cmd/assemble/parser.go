@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// remove comment
+// This function removes comment
 // example: "@32 // A instruction" -> "@32"
 func removeComment(line string) string {
 	for i := 1; i < len(line); i++ {
@@ -16,23 +16,23 @@ func removeComment(line string) string {
 	return strings.TrimSpace(line)
 }
 
-// a command
+// This is structure　for a command
 type aCommand struct {
 	Data string
 }
 
-// c command
+// This is structure　for c command
 type cCommand struct {
 	Comp string
 	Dest string
 	Jump string
 }
 
-// check the command type
+// This function checks the command type and return assembler's command
 // if line has "@", it is a command
 // elif line has "()", it is l command
 // else, it is c command
-func commandType(line string) (string, error) {
+func convertAsmCommand(line string) (string, error) {
 	for _, char := range line {
 		if string([]rune{char}) == "@" {
 			return aBinary(aParser(line))
@@ -45,7 +45,7 @@ func commandType(line string) (string, error) {
 	return "", fmt.Errorf("unsupported")
 }
 
-// a command parser extracts strings after "@"
+// "A command parser" extracts strings after "@"
 // example: "@32" -> aCommand.Data = "32"
 func aParser(line string) aCommand {
 	var val = make([]byte, 0, 100)
@@ -59,7 +59,7 @@ func aParser(line string) aCommand {
 	}
 }
 
-// l command parser extracts strings after "(" and before ")"
+// "L command parser" extracts strings after "(" and before ")"
 // example: "(LOOP)" -> lCommand.Data = "LOOP"
 func lParser(line string) string {
 	var val = make([]byte, 0, 100)
@@ -74,7 +74,7 @@ func lParser(line string) string {
 	return string(val)
 }
 
-// c command parser extracts some strings; one called dest is before "=",
+// "C command parser" extracts some strings; one called dest is before "=",
 // second called comp is within "=" and ";", the other called jump is after ";"
 // example: "A=D-A;JEQ" -> cCommand.Comp = "D-A", cCommand.Dest = "A", cCommand.Jump = "JEQ"
 func cParser(line string) cCommand {
@@ -107,7 +107,7 @@ func cParser(line string) cCommand {
 	}
 }
 
-// create dict contained pre symbol
+// This function creates dictionary contained pre symbol
 func preDict() {
 	dict["SP"] = 0
 	dict["LCL"] = 1

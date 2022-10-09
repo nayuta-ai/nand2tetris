@@ -97,7 +97,7 @@ func TestCommandType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := commandType(tt.line); got != tt.want {
+			if got, _ := convertAsmCommand(tt.line); got != tt.want {
 				t.Errorf("want %s. but %s", tt.want, got)
 			}
 		})
