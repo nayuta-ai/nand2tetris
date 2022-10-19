@@ -4,16 +4,31 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // parseArgs returns the file path as the string type.
-func parseArgs() (string, error) {
-	f := flag.String("filename", "", "filename")
+func parseArgs() (string, string, error) {
+	fp := flag.String("filepath", "", "filepath")
+	fn := flag.String("filename", "", "filename")
 	flag.Parse()
-	if *f == "" {
-		return "", fmt.Errorf("error: filename is empty")
+	if *fn == "" {
+		return "", "", fmt.Errorf("error: filename is empty")
 	}
-	return fmt.Sprintf(*f), nil
+	if *fp == "" {
+		return "", "", fmt.Errorf("error: filepath doesn't exist")
+	}
+	return fmt.Sprintf(*fp), fmt.Sprintf(*fn), nil
+}
+
+func checkSys(files []string) bool {
+	for _, file := range files {
+		file_split := strings.Split(file, "/")
+		if file_split[len(file_split)-1] == "Sys.vm" {
+			return true
+		}
+	}
+	return false
 }
 
 // createAsm returns .asm file as the stdoutput.

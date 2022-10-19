@@ -40,7 +40,7 @@ func TestCommandReturn(t *testing.T) {
 		command string
 		want    string
 	}{
-		{"test_1", "return", "//return\n@LCL\nD=M\n@R5\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@ARG\nA=M\nM=D\n@ARG\nD=M\n@SP\nM=D+1\n@R5\nD=M\n@1\nD=D-A\nA=D\nD=M\n@THAT\nM=D\n@R5\nD=M\n@2\nD=D-A\nA=D\nD=M\n@THIS\nM=D\n@R5\nD=M\n@3\nD=D-A\nA=D\nD=M\n@ARG\nM=D\n@R5\nD=M\n@4\nD=D-A\nA=D\nD=M\n@LCL\nM=D\n@R5\nD=M\n@5\nD=D-A\nA=D\nD=M\n@R6\nM=D\n@R6\nA=M\n0;JMP\n"},
+		{"test_1", "return", "//return\n@LCL\nD=M\n@R13\nM=D\n@R13\nD=M\n@5\nD=D-A\nA=D\nD=M\n@R14\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@ARG\nA=M\nM=D\n@ARG\nD=M\n@SP\nM=D+1\n@R13\nD=M\n@1\nD=D-A\nA=D\nD=M\n@THAT\nM=D\n@R13\nD=M\n@2\nD=D-A\nA=D\nD=M\n@THIS\nM=D\n@R13\nD=M\n@3\nD=D-A\nA=D\nD=M\n@ARG\nM=D\n@R13\nD=M\n@4\nD=D-A\nA=D\nD=M\n@LCL\nM=D\n@R14\nA=M\n0;JMP\n"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

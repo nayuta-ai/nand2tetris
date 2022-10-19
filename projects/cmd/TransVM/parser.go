@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -22,6 +23,10 @@ func parser(command string) string {
 		} else if div_command[0] == "function" {
 			asm_command, _ := commandFunction(remove_comment, div_command)
 			return asm_command
+		} else if div_command[0] == "call" {
+			function_name := div_command[1]
+			n_arg, _ := strconv.Atoi(div_command[2])
+			return commandCall(function_name, n_arg)
 		}
 	}
 	return ""
