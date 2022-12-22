@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -35,12 +36,22 @@ var keywordSlice = []string{
 	"return",
 }
 
+type TokensInterface interface {
+	Next() (Token, error)
+	Lookup() (Token, error)
+}
+
+type Tokens struct {
+	Token []Token
+	Index int
+}
+
 type Token struct {
 	Type  string
 	Value string
 }
 
-func tokenizer(scanner *bufio.Scanner) ([]Token, error) {
+func tokenizer(scanner *bufio.Scanner) (Tokens, error) {
 	var token []Token
 	for scanner.Scan() {
 		content := scanner.Text()
@@ -78,9 +89,9 @@ func tokenizer(scanner *bufio.Scanner) ([]Token, error) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return Tokens{}, err
 	}
-	return token, nil
+	return Tokens{token, 0}, nil
 }
 
 func appendToken(currString string, token []Token) []Token {
@@ -131,4 +142,19 @@ func deleteComments(line string) string {
 		return deletedLine
 	}
 	return line
+}
+
+func (t *Tokens) Next() (Token, error) {
+	t.Index++
+	if t.Index >= len(t.Token) {
+		return t.Token[0], errors.New("no more tokens")
+	}
+	return t.Token[t.Index], nil
+}
+
+func (t *Tokens) Lookup(i int) (Token, error) {
+	if t.Index+i >= len(t.Token) {
+		return t.Token[0], errors.New("no more tokens")
+	}
+	return t.Token[t.Index+i], nil
 }

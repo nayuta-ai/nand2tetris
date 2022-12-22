@@ -41,37 +41,10 @@ func main() {
 	if len(files) < 1 {
 		logrus.Fatal(fmt.Sprintf("There is no file in %s", path[0]))
 	}
-	for i, file := range files {
-		fp, err := os.Open(file)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		tk, err := analyzer.SyntaxAnalyzer(fp)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		err = convertToTXMLformat(i, tk)
+	for _, file := range files {
+		err = analyzer.SyntaxAnalyzer(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}
 	}
-}
-
-func convertToTXMLformat(i int, token []analyzer.Token) error {
-	var contents string
-	contents += "<tokens>\n"
-	for _, tk := range token {
-		contents += fmt.Sprintf("<%s> %s </%s>\n", tk.Type, tk.Value, tk.Type)
-	}
-	contents += "</tokens>"
-	f, err := os.Create(fmt.Sprintf("sample%dT.xml", i))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, err = f.WriteString(contents)
-	if err != nil {
-		return err
-	}
-	return nil
 }
