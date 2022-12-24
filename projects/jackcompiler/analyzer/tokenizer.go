@@ -41,6 +41,21 @@ type TokensInterface interface {
 	Lookup() (Token, error)
 }
 
+func (t *Tokens) Next() (Token, error) {
+	t.Index++
+	if t.Index >= len(t.Token) {
+		return t.Token[0], errors.New("no more tokens")
+	}
+	return t.Token[t.Index], nil
+}
+
+func (t *Tokens) Lookup(i int) (Token, error) {
+	if t.Index+i >= len(t.Token) {
+		return t.Token[0], errors.New("no more tokens")
+	}
+	return t.Token[t.Index+i], nil
+}
+
 type Tokens struct {
 	Token []Token
 	Index int
@@ -74,15 +89,7 @@ func tokenizer(scanner *bufio.Scanner) (Tokens, error) {
 			} else if strings.ContainsRune(symbolCharacter, char) {
 				token = appendToken(currString, token)
 				currString = ""
-				if char == '<' {
-					token = append(token, Token{"symbol", "&lt;"})
-				} else if char == '>' {
-					token = append(token, Token{"symbol", "&gt;"})
-				} else if char == '&' {
-					token = append(token, Token{"symbol", "&amp;"})
-				} else {
-					token = append(token, Token{"symbol", fmt.Sprintf("%c", char)})
-				}
+				token = append(token, Token{"symbol", normalizexXMLSymbol(char)})
 			} else {
 				currString += fmt.Sprintf("%c", char)
 			}
@@ -96,8 +103,9 @@ func tokenizer(scanner *bufio.Scanner) (Tokens, error) {
 
 func appendToken(currString string, token []Token) []Token {
 	if currString == "" {
-		//
-	} else if contains(keywordSlice, currString) {
+		return token
+	}
+	if contains(keywordSlice, currString) {
 		token = append(token, Token{"keyword", currString})
 	} else if _, err := strconv.Atoi(currString); err == nil {
 		token = append(token, Token{"integerConstant", currString})
@@ -115,7 +123,6 @@ func contains(s []string, str string) bool {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -144,17 +151,13 @@ func deleteComments(line string) string {
 	return line
 }
 
-func (t *Tokens) Next() (Token, error) {
-	t.Index++
-	if t.Index >= len(t.Token) {
-		return t.Token[0], errors.New("no more tokens")
+func normalizexXMLSymbol(char rune) string {
+	if char == '<' {
+		return "&lt;"
+	} else if char == '>' {
+		return "&gt;"
+	} else if char == '&' {
+		return "&amp;"
 	}
-	return t.Token[t.Index], nil
-}
-
-func (t *Tokens) Lookup(i int) (Token, error) {
-	if t.Index+i >= len(t.Token) {
-		return t.Token[0], errors.New("no more tokens")
-	}
-	return t.Token[t.Index+i], nil
+	return fmt.Sprintf("%c", char)
 }

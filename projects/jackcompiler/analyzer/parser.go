@@ -127,17 +127,20 @@ func (pt *ParseTree) parseSubroutineBody(tokens Tokens) (Tokens, error) {
 	}
 	for {
 		if tokens.Token[tokens.Index].Value == "}" {
+			// symbol
 			tokens, err = tree.addChild(tokens)
 			if err != nil {
 				return tokens, err
 			}
 			break
 		} else if tokens.Token[tokens.Index].Value == "var" {
+			// varDec
 			tokens, err = tree.parseVarDec(tokens)
 			if err != nil {
 				return tokens, nil
 			}
 		} else {
+			// statements
 			tokens, err = tree.parseStatements(tokens)
 			if err != nil {
 				return tokens, nil
@@ -188,7 +191,7 @@ func (pt *ParseTree) parseStatements(tokens Tokens) (Tokens, error) {
 				return tokens, err
 			}
 		} else if tokens.Token[tokens.Index].Value == "if" {
-			tokens, err = tree.parseIfelse(tokens)
+			tokens, err = tree.parseIf(tokens)
 			if err != nil {
 				return tokens, err
 			}
@@ -208,101 +211,95 @@ func (pt *ParseTree) parseStatements(tokens Tokens) (Tokens, error) {
 func (pt *ParseTree) parseDo(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("doStatement", "")
+	// do
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// subroutineCall
+	tokens, err = tree.parseSubroutineCall(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol(;)
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	pt.Children = append(pt.Children, tree)
+	return tokens, nil
+}
+
+func (pt *ParseTree) parseSubroutineCall(tokens Tokens) (Tokens, error) {
+	var err error
 	for {
-		if tokens.Token[tokens.Index].Value == ";" {
-			tokens, err = tree.addChild(tokens)
+		if tokens.Token[tokens.Index].Value == "(" {
+			tokens, err = pt.addChild(tokens)
+			if err != nil {
+				return tokens, err
+			}
+			tokens, err = pt.parseExpressionList(tokens)
+			if err != nil {
+				return tokens, err
+			}
+			tokens, err = pt.addChild(tokens)
 			if err != nil {
 				return tokens, err
 			}
 			break
-		} else if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpressionList(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "[" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
+		}
+		tokens, err = pt.addChild(tokens)
+		if err != nil {
+			return tokens, err
 		}
 	}
-	pt.Children = append(pt.Children, tree)
 	return tokens, nil
 }
 
 func (pt *ParseTree) parseLet(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("letStatement", "")
-	for {
-		if tokens.Token[tokens.Index].Value == ";" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			break
-		} else if tokens.Token[tokens.Index].Value == "=" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpressionList(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "[" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
+	// symbol
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// identifier(varName)
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	if tokens.Token[tokens.Index].Value == "[" {
+		// symbol("[")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
 		}
+		// expression
+		tokens, err = tree.parseExpression(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// symbol("]")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+	}
+	// symbol(=)
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// expression
+	tokens, err = tree.parseExpression(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol(;)
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
 	}
 	pt.Children = append(pt.Children, tree)
 	return tokens, nil
@@ -311,53 +308,27 @@ func (pt *ParseTree) parseLet(tokens Tokens) (Tokens, error) {
 func (pt *ParseTree) parseReturn(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("returnStatement", "")
+	// return
 	tokens, err = tree.addChild(tokens)
 	if err != nil {
 		return tokens, err
 	}
-	for {
-		if tokens.Token[tokens.Index].Value == ";" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			break
-		} else if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpressionList(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "[" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else {
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
+	if tokens.Token[tokens.Index].Value != ";" {
+		tokens, err = tree.parseExpression(tokens)
+		if err != nil {
+			return tokens, err
 		}
+	}
+	// symbol (;)
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
 	}
 	pt.Children = append(pt.Children, tree)
 	return tokens, nil
 }
+
+var op = []string{"+", "-", "*", "/", "&amp;", "&lt;", "&gt;", "|", "="}
 
 func (pt *ParseTree) parseExpression(tokens Tokens) (Tokens, error) {
 	var err error
@@ -365,17 +336,10 @@ func (pt *ParseTree) parseExpression(tokens Tokens) (Tokens, error) {
 	for {
 		if contains([]string{"]", ")", ";", ","}, tokens.Token[tokens.Index].Value) {
 			break
-		} else if contains([]string{"+", "-", "&amp;", "&lt;", "&gt;", "*", "/", "|", "=", "~"}, tokens.Token[tokens.Index].Value) {
-			if contains([]string{"-", "~"}, tokens.Token[tokens.Index].Value) && len(tree.Children) == 0 {
-				tokens, err = tree.parseTerm(tokens)
-				if err != nil {
-					return tokens, err
-				}
-			} else {
-				tokens, err = tree.addChild(tokens)
-				if err != nil {
-					return tokens, err
-				}
+		} else if contains(op, tokens.Token[tokens.Index].Value) && len(tree.Children) != 0 {
+			tokens, err = tree.addChild(tokens)
+			if err != nil {
+				return tokens, err
 			}
 		} else {
 			tokens, err = tree.parseTerm(tokens)
@@ -388,56 +352,66 @@ func (pt *ParseTree) parseExpression(tokens Tokens) (Tokens, error) {
 	return tokens, nil
 }
 
+var unaryOp = []string{"-", "~"}
+
 func (pt *ParseTree) parseTerm(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("term", "")
-	for {
-		if contains([]string{"+", "-", "&amp;", "&lt;", "&gt;", "*", "/", "]", ")", ";", ",", "|", "=", "~"}, tokens.Token[tokens.Index].Value) {
-			if contains([]string{"-", "~"}, tokens.Token[tokens.Index].Value) && len(tree.Children) == 0 {
-				tokens, err = tree.addChild(tokens)
-				if err != nil {
-					return tokens, err
-				}
-				tokens, err = tree.parseTerm(tokens)
-				if err != nil {
-					return tokens, err
-				}
-			} else {
-				break
-			}
-		} else if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpressionList(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			break
-		} else if tokens.Token[tokens.Index].Value == "[" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			break
-		} else {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
+	if tokens.Token[tokens.Index].Value == "(" {
+		// symbol ("(")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// expression
+		tokens, err = tree.parseExpression(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// symbol (")")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+	} else if contains(unaryOp, tokens.Token[tokens.Index].Value) {
+		// symbol (unaryOp)
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// term
+		tokens, err = tree.parseTerm(tokens)
+		if err != nil {
+			return tokens, err
+		}
+	} else {
+		// identifier
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+	}
+	if tokens.Token[tokens.Index].Value == "[" {
+		// symbol ("[")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// expression
+		tokens, err = tree.parseExpression(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// symbol ("]")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+	} else if tokens.Token[tokens.Index].Value == "(" || tokens.Token[tokens.Index].Value == "." {
+		// subroutineCall
+		tokens, err = tree.parseSubroutineCall(tokens)
+		if err != nil {
+			return tokens, err
 		}
 	}
 	pt.Children = append(pt.Children, tree)
@@ -461,123 +435,111 @@ func (pt *ParseTree) parseExpressionList(tokens Tokens) (Tokens, error) {
 			return tokens, err
 		}
 	}
-	if len(tree.Children) == 1 && len(tree.Children[0].Children) == 1 && tree.Children[0].Children[0].Children[0].Value != "this" && !contains([]string{"integerConstant", "keyword", "identifier", "stringConstant"}, tree.Children[0].Children[0].Children[0].Type) {
-		// expression
-		pt.Children = append(pt.Children, tree.Children[0])
-	} else if len(tree.Children) == 1 && len(tree.Children[0].Children) != 1 {
-		// expression
-		pt.Children = append(pt.Children, tree.Children[0])
-	} else {
-		// expressionList
-		pt.Children = append(pt.Children, tree)
-	}
-	return tokens, nil
-}
-
-func (pt *ParseTree) parseIfelse(tokens Tokens) (Tokens, error) {
-	var err error
-	tree := newParseTree("ifStatement", "")
-	tokens, err = tree.parseIf(tokens)
-	if err != nil {
-		return tokens, err
-	}
-	for {
-		if contains([]string{"else"}, tokens.Token[tokens.Index].Value) {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseIf(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else {
-			break
-		}
-	}
 	pt.Children = append(pt.Children, tree)
 	return tokens, nil
 }
 
 func (pt *ParseTree) parseIf(tokens Tokens) (Tokens, error) {
 	var err error
-	if tokens.Token[tokens.Index].Value == "if" {
-		tokens, err = pt.addChild(tokens)
+	tree := newParseTree("ifStatement", "")
+	// if
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("(")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// expression
+	tokens, err = tree.parseExpression(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol (")")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("{")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// statements
+	tokens, err = tree.parseStatements(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("}")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	if tokens.Token[tokens.Index].Value == "else" {
+		// else
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// symbol ("{")
+		tokens, err = tree.addChild(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// statements
+		tokens, err = tree.parseStatements(tokens)
+		if err != nil {
+			return tokens, err
+		}
+		// symbol ("}")
+		tokens, err = tree.addChild(tokens)
 		if err != nil {
 			return tokens, err
 		}
 	}
-	for {
-		if !contains([]string{"(", "{"}, tokens.Token[tokens.Index].Value) {
-			break
-		} else if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = pt.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = pt.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = pt.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "{" {
-			tokens, err = pt.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = pt.parseStatements(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = pt.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		}
-	}
+	pt.Children = append(pt.Children, tree)
 	return tokens, nil
 }
 
 func (pt *ParseTree) parseWhile(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("whileStatement", "")
-	for {
-		if tokens.Token[tokens.Index].Value == "(" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseExpression(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		} else if tokens.Token[tokens.Index].Value == "{" {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.parseStatements(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-			break
-		} else {
-			tokens, err = tree.addChild(tokens)
-			if err != nil {
-				return tokens, err
-			}
-		}
+	// while
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("(")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// expression
+	tokens, err = tree.parseExpression(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol (")")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("{")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// statements
+	tokens, err = tree.parseStatements(tokens)
+	if err != nil {
+		return tokens, err
+	}
+	// symbol ("}")
+	tokens, err = tree.addChild(tokens)
+	if err != nil {
+		return tokens, err
 	}
 	pt.Children = append(pt.Children, tree)
 	return tokens, nil
