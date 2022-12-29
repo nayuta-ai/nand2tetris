@@ -29,7 +29,7 @@ func parseClass(tokens Tokens) (ParseTree, error) {
 	}
 	// classVarDec
 	for {
-		if !contains([]string{"static", "field"}, tokens.Token[tokens.Index].Value) {
+		if !Contains([]string{"static", "field"}, tokens.Token[tokens.Index].Value) {
 			break
 		}
 		tokens, err = tree.parseClassVarDec(tokens)
@@ -39,7 +39,7 @@ func parseClass(tokens Tokens) (ParseTree, error) {
 	}
 	// subroutineDec
 	for {
-		if !contains([]string{"constructor", "function", "method"}, tokens.Token[tokens.Index].Value) {
+		if !Contains([]string{"constructor", "function", "method"}, tokens.Token[tokens.Index].Value) {
 			break
 		}
 		tokens, err = tree.parseSubroutineDec(tokens)
@@ -334,9 +334,9 @@ func (pt *ParseTree) parseExpression(tokens Tokens) (Tokens, error) {
 	var err error
 	tree := newParseTree("expression", "")
 	for {
-		if contains([]string{"]", ")", ";", ","}, tokens.Token[tokens.Index].Value) {
+		if Contains([]string{"]", ")", ";", ","}, tokens.Token[tokens.Index].Value) {
 			break
-		} else if contains(op, tokens.Token[tokens.Index].Value) && len(tree.Children) != 0 {
+		} else if Contains(op, tokens.Token[tokens.Index].Value) && len(tree.Children) != 0 {
 			tokens, err = tree.addChild(tokens)
 			if err != nil {
 				return tokens, err
@@ -373,7 +373,7 @@ func (pt *ParseTree) parseTerm(tokens Tokens) (Tokens, error) {
 		if err != nil {
 			return tokens, err
 		}
-	} else if contains(unaryOp, tokens.Token[tokens.Index].Value) {
+	} else if Contains(unaryOp, tokens.Token[tokens.Index].Value) {
 		// symbol (unaryOp)
 		tokens, err = tree.addChild(tokens)
 		if err != nil {
@@ -424,7 +424,7 @@ func (pt *ParseTree) parseExpressionList(tokens Tokens) (Tokens, error) {
 	for {
 		if tokens.Token[tokens.Index].Value == ")" {
 			break
-		} else if contains([]string{","}, tokens.Token[tokens.Index].Value) {
+		} else if Contains([]string{","}, tokens.Token[tokens.Index].Value) {
 			tokens, err = tree.addChild(tokens)
 			if err != nil {
 				return tokens, err

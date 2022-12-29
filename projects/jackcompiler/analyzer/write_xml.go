@@ -23,7 +23,7 @@ func convertToXMLformat(tree ParseTree, file string) error {
 func convertParseTreeToString(tree *ParseTree, indent int) string {
 	tab := strings.Repeat("  ", indent)
 	var line string
-	if contains([]string{"keyword", "symbol", "identifier", "integerConstant", "stringConstant"}, tree.Type) {
+	if Contains([]string{"keyword", "symbol", "identifier", "integerConstant", "stringConstant"}, tree.Type) {
 		line += " " + tree.Value + " "
 	} else {
 		line += "\n"

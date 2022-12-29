@@ -12,7 +12,7 @@ func SyntaxAnalyzer(path string) error {
 	}
 	defer fp.Close()
 	scanner := bufio.NewScanner(fp)
-	token, err := tokenizer(scanner)
+	token, err := Tokenizer(scanner)
 	if err != nil {
 		return err
 	}
@@ -27,4 +27,18 @@ func SyntaxAnalyzer(path string) error {
 		return err
 	}
 	return nil
+}
+
+func GetTokens(path string) (*Tokens, error) {
+	fp, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+	scanner := bufio.NewScanner(fp)
+	tokens, err := Tokenizer(scanner)
+	if err != nil {
+		return nil, err
+	}
+	return &tokens, nil
 }

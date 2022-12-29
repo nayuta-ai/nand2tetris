@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"jackcompiler/engine"
 	"os"
 	"path/filepath"
-
-	"jackcompiler/analyzer"
 
 	"github.com/sirupsen/logrus"
 )
@@ -42,7 +41,7 @@ func main() {
 		logrus.Fatal(fmt.Sprintf("There is no file in %s", path[0]))
 	}
 	for _, file := range files {
-		err = analyzer.SyntaxAnalyzer(file)
+		err = engine.Compiler(file)
 		if err != nil {
 			logrus.Fatal(err)
 		}

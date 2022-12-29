@@ -12,6 +12,15 @@ var symbolCharacter string = "(){}.,;+-*/=<>[]&|~"
 
 var commentFlags bool = false
 
+// Token types
+const (
+	TokenTypeKeyword        = "keyword"
+	TokenTypeSymbol         = "symbol"
+	TokenTypeIntConstant    = "integerConstant"
+	TokenTypeStringConstant = "stringConstant"
+	TokenTypeIdentifier     = "identifier"
+)
+
 var keywordSlice = []string{
 	"class",
 	"constructor",
@@ -66,7 +75,7 @@ type Token struct {
 	Value string
 }
 
-func tokenizer(scanner *bufio.Scanner) (Tokens, error) {
+func Tokenizer(scanner *bufio.Scanner) (Tokens, error) {
 	var token []Token
 	for scanner.Scan() {
 		content := scanner.Text()
@@ -105,7 +114,7 @@ func appendToken(currString string, token []Token) []Token {
 	if currString == "" {
 		return token
 	}
-	if contains(keywordSlice, currString) {
+	if Contains(keywordSlice, currString) {
 		token = append(token, Token{"keyword", currString})
 	} else if _, err := strconv.Atoi(currString); err == nil {
 		token = append(token, Token{"integerConstant", currString})
@@ -116,8 +125,8 @@ func appendToken(currString string, token []Token) []Token {
 }
 
 // https://play.golang.org/p/Qg_uv_inCek
-// contains checks if a string is present in a slice
-func contains(s []string, str string) bool {
+// Contains checks if a string is present in a slice
+func Contains(s []string, str string) bool {
 	for _, v := range s {
 		if v == str {
 			return true
